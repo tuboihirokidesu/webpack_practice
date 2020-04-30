@@ -1,7 +1,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
   entry: "./src/javascripts/main.js",
@@ -22,15 +22,27 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.jpg/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              esModule: false,
+              name: 'images/image.jpg',
+            },
+          },
+        ],
+      },
     ],
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: './stylesheets/my.css',
+      filename: "./stylesheets/my.css",
     }),
     new HtmlWebpackPlugin({
-      template: './src/templates/index.html',
+      template: "./src/templates/index.html",
     }),
-    new CleanWebpackPlugin (),
+    new CleanWebpackPlugin(),
   ],
 };
