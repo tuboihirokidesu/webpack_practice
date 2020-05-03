@@ -2,9 +2,14 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
-  entry: "./src/javascripts/main.js",
+  mode: "development",
+  devtool: "source-map",
+  entry: {
+    main: "./src/javascripts/main.js",
+  },
   output: {
     path: path.resolve(__dirname, "./dist"),
     filename: "javascripts/main.js",
@@ -12,27 +17,63 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(css|sass|scss)/,
+        test: /\.vue/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader:'vue-loader',
+          },
+        ],
+      },
+      {
+        test: /\.(js|jsx)/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                ["@babel/preset-env", { targets: "> 0.25%, not dead" }],
+                "@babel/preset-react",
+              ],
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(css|scss|sass)$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
           },
           {
             loader: "css-loader",
+            options: {
+              sourceMap: false,
+            },
           },
           {
-            loader: 'sass-loader',
-          }
+            loader: "sass-loader",
+          },
         ],
       },
       {
-        test: /\.jpg/,
+        test: /\.(png|jpg|jpeg)$/i,
         use: [
           {
             loader: "file-loader",
             options: {
               esModule: false,
-              name: "images/image.jpg",
+              name: "images/[name].[ext]",
+            },
+          },
+          {
+            loader: "image-webpack-loader",
+            options: {
+              mozjpeg: {
+                progressive: true,
+                quality: 65,
+              },
             },
           },
         ],
@@ -65,16 +106,17 @@ module.exports = {
     ],
   },
   plugins: [
+    new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
-      filename: "./stylesheets/my.css",
+      filename: "./stylesheets/main.css",
     }),
     new HtmlWebpackPlugin({
       template: "./src/templates/index.pug",
-      filename: 'index.html',
+      filename: "index.html",
     }),
     new HtmlWebpackPlugin({
       template: "./src/templates/access.pug",
-      filename: 'access.html',
+      filename: "access.html",
     }),
     new CleanWebpackPlugin(),
   ],
